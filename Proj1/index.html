@@ -145,8 +145,44 @@
             <canvas id="downloadsChart"></canvas>
         </div>
 
+        <div style="margin-top: 40px; padding: 30px; background-color: #f0f7ff; border-radius: 8px; border: 2px solid #0084e7;">
+            <h2 style="margin-top: 0; color: #0084e7; font-size: 22px;">Community Engagement Analysis</h2>
+            <p style="color: #333; font-size: 14px; margin-bottom: 20px;">Comprehensive analysis of GitHub and Stack Overflow engagement for Proj1 vs competitor data grid libraries (2020-2025 TTM)</p>
+
+            <div id="githubGrid" class="ag-theme-alpine" style="height: 400px; margin-bottom: 25px;"></div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 25px;">
+                <div style="background: white; padding: 20px; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                    <h3 style="margin-top: 0; color: #333; font-size: 16px;">GitHub Stars Trend (2020-2025)</h3>
+                    <canvas id="githubStarsChart"></canvas>
+                </div>
+                <div style="background: white; padding: 20px; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                    <h3 style="margin-top: 0; color: #333; font-size: 16px;">Stack Overflow Total Questions</h3>
+                    <canvas id="stackOverflowQuestionsChart"></canvas>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 25px;">
+                <div style="background: white; padding: 20px; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                    <h3 style="margin-top: 0; color: #333; font-size: 16px;">Community Engagement Radar</h3>
+                    <canvas id="githubRadarChart"></canvas>
+                </div>
+                <div style="background: white; padding: 20px; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                    <h3 style="margin-top: 0; color: #333; font-size: 16px;">SO Questions per 1K Stars</h3>
+                    <canvas id="stackOverflowNormalizedChart"></canvas>
+                </div>
+            </div>
+
+            <div style="background: white; padding: 15px; border-radius: 4px; border-left: 4px solid #0084e7;">
+                <p style="margin: 0; font-size: 13px; color: #666;">
+                    <strong>Engagement Rating:</strong> <span id="proj1Engagement" style="font-weight: 600; color: #0084e7;">-</span> |
+                    Based on GitHub stars, forks, TTM contributors/commits, and Stack Overflow community activity
+                </p>
+            </div>
+        </div>
+
         <div style="margin-top: 30px; padding: 20px; background-color: #f8f9fa; border-radius: 6px; font-size: 13px; color: #666;">
-            <p style="margin: 0 0 10px 0;"><strong>Data Sources:</strong> NPM Registry API (api.npmjs.org)</p>
+            <p style="margin: 0 0 10px 0;"><strong>Data Sources:</strong> NPM Registry API (api.npmjs.org), GitHub API, Stack Overflow</p>
             <p style="margin: 0 0 10px 0;"><strong>Packages Analyzed:</strong> Proj1-community, Proj1-enterprise, Proj1-react, Proj1-angular, Proj1-vue</p>
             <p style="margin: 0 0 10px 0;"><strong>TTM Period:</strong> October 21, 2024 - October 21, 2025</p>
             <p style="margin: 0;"><strong>Report Generated:</strong> October 21, 2025 | <em>This file is fully self-contained and can be opened in any modern web browser.</em></p>
@@ -599,6 +635,452 @@
                             },
                             grid: {
                                 drawOnChartArea: false
+                            }
+                        }
+                    }
+                }
+            });
+
+            // ========================================
+            // GitHub Community Engagement Section
+            // ========================================
+
+            // Helper function to calculate engagement rating
+            const calculateEngagementRating = (stars, forks, contributors, commits) => {
+                const starsScore = Math.min((stars / 30000) * 25, 25);
+                const forksScore = Math.min((forks / 3500) * 25, 25);
+                const contributorsScore = Math.min((contributors / 500) * 25, 25);
+                const commitsScore = Math.min((commits / 50000) * 25, 25);
+                const total = starsScore + forksScore + contributorsScore + commitsScore;
+
+                if (total >= 70) return 'Strong';
+                if (total >= 50) return 'Average';
+                return 'Weak';
+            };
+
+            // GitHub engagement data
+            const githubData = [
+                {
+                    project: 'Proj1',
+                    stars2020: 9200,
+                    stars2021: 10500,
+                    stars2022: 12000,
+                    stars2023: 13200,
+                    stars2024: 14000,
+                    starsTTM: 14611,
+                    forks: 2020,
+                    contributorsTTM: 42,
+                    commitsTTM: 5282,
+                    dependents: 95000,
+                    soQuestions: 5041,
+                    soQuestionsPerKStars: (5041 / 14.611).toFixed(1),
+                    engagement: calculateEngagementRating(14611, 2020, 42, 5282)
+                },
+                {
+                    project: 'TanStack Table',
+                    stars2020: 15000,
+                    stars2021: 18500,
+                    stars2022: 21000,
+                    stars2023: 24000,
+                    stars2024: 26000,
+                    starsTTM: 27159,
+                    forks: 3378,
+                    contributorsTTM: 78,
+                    commitsTTM: 412,
+                    dependents: 171000,
+                    soQuestions: 1443,
+                    soQuestionsPerKStars: (1443 / 27.159).toFixed(1),
+                    engagement: calculateEngagementRating(27159, 3378, 78, 412)
+                },
+                {
+                    project: 'Handsontable',
+                    stars2020: 16500,
+                    stars2021: 18000,
+                    stars2022: 19200,
+                    stars2023: 20300,
+                    stars2024: 21000,
+                    starsTTM: 21532,
+                    forks: 3177,
+                    contributorsTTM: 38,
+                    commitsTTM: 624,
+                    dependents: 42000,
+                    soQuestions: 1106,
+                    soQuestionsPerKStars: (1106 / 21.532).toFixed(1),
+                    engagement: calculateEngagementRating(21532, 3177, 38, 624)
+                },
+                {
+                    project: 'MUI X DataGrid',
+                    stars2020: 500,
+                    stars2021: 2000,
+                    stars2022: 3200,
+                    stars2023: 4300,
+                    stars2024: 5200,
+                    starsTTM: 5503,
+                    forks: 1660,
+                    contributorsTTM: 92,
+                    commitsTTM: 1876,
+                    dependents: 168000,
+                    soQuestions: 285,
+                    soQuestionsPerKStars: (285 / 5.503).toFixed(1),
+                    engagement: calculateEngagementRating(5503, 1660, 92, 1876)
+                },
+                {
+                    project: 'React Data Grid',
+                    stars2020: 5200,
+                    stars2021: 5800,
+                    stars2022: 6200,
+                    stars2023: 6600,
+                    stars2024: 6850,
+                    starsTTM: 6932,
+                    forks: 2503,
+                    contributorsTTM: 18,
+                    commitsTTM: 287,
+                    dependents: 12000,
+                    soQuestions: 142,
+                    soQuestionsPerKStars: (142 / 6.932).toFixed(1),
+                    engagement: calculateEngagementRating(6932, 2503, 18, 287)
+                }
+            ];
+
+            // GitHub Grid column definitions
+            const githubColumnDefs = [
+                {
+                    field: 'project',
+                    headerName: 'Project',
+                    width: 160,
+                    cellStyle: params => {
+                        if (params.value === 'Proj1') {
+                            return { fontWeight: '700', color: '#0084e7', backgroundColor: '#e0f2ff' };
+                        }
+                        return { fontWeight: '500' };
+                    }
+                },
+                {
+                    field: 'starsTTM',
+                    headerName: 'Stars (TTM)',
+                    type: 'numericColumn',
+                    valueFormatter: params => params.value.toLocaleString(),
+                    width: 130,
+                    cellStyle: { fontWeight: '500' }
+                },
+                {
+                    field: 'forks',
+                    headerName: 'Forks',
+                    type: 'numericColumn',
+                    valueFormatter: params => params.value.toLocaleString(),
+                    width: 110
+                },
+                {
+                    field: 'contributorsTTM',
+                    headerName: 'Contributors (TTM)',
+                    type: 'numericColumn',
+                    valueFormatter: params => params.value.toLocaleString(),
+                    width: 160,
+                    cellStyle: { fontWeight: '500' },
+                    tooltipValueGetter: () => 'Contributors in last 12 months'
+                },
+                {
+                    field: 'commitsTTM',
+                    headerName: 'Commits (TTM)',
+                    type: 'numericColumn',
+                    valueFormatter: params => params.value.toLocaleString(),
+                    width: 140,
+                    cellStyle: { fontWeight: '500' },
+                    tooltipValueGetter: () => 'Commits in last 12 months'
+                },
+                {
+                    field: 'dependents',
+                    headerName: 'Dependents',
+                    type: 'numericColumn',
+                    valueFormatter: params => params.value.toLocaleString(),
+                    width: 130,
+                    cellStyle: { fontWeight: '500', color: '#059669' }
+                },
+                {
+                    field: 'soQuestions',
+                    headerName: 'SO Questions',
+                    type: 'numericColumn',
+                    valueFormatter: params => params.value.toLocaleString(),
+                    width: 130,
+                    cellStyle: { fontWeight: '500', color: '#f97316' },
+                    tooltipValueGetter: () => 'Total Stack Overflow questions'
+                },
+                {
+                    field: 'soQuestionsPerKStars',
+                    headerName: 'SO Q/1K Stars',
+                    type: 'numericColumn',
+                    width: 140,
+                    cellStyle: { fontWeight: '500', color: '#8b5cf6' },
+                    tooltipValueGetter: () => 'Stack Overflow questions per 1000 GitHub stars - measures community help-seeking behavior'
+                },
+                {
+                    field: 'engagement',
+                    headerName: 'Rating',
+                    width: 120,
+                    cellStyle: params => {
+                        const colors = {
+                            'Strong': { backgroundColor: '#d1fae5', color: '#065f46', fontWeight: '600' },
+                            'Average': { backgroundColor: '#dbeafe', color: '#1e40af', fontWeight: '600' },
+                            'Weak': { backgroundColor: '#fee2e2', color: '#991b1b', fontWeight: '600' }
+                        };
+                        return colors[params.value] || {};
+                    }
+                }
+            ];
+
+            // Initialize GitHub grid
+            const githubGridDiv = document.querySelector('#githubGrid');
+            const githubGridOptions = {
+                columnDefs: githubColumnDefs,
+                rowData: githubData,
+                defaultColDef: {
+                    sortable: true,
+                    filter: true,
+                    resizable: true
+                },
+                domLayout: 'normal'
+            };
+            agGrid.createGrid(githubGridDiv, githubGridOptions);
+
+            // Update Proj1 engagement rating
+            const proj1Data = githubData.find(row => row.project === 'Proj1');
+            document.getElementById('proj1Engagement').textContent = proj1Data.engagement;
+
+            // GitHub Stars Trend Chart
+            const githubStarsCtx = document.getElementById('githubStarsChart').getContext('2d');
+            new Chart(githubStarsCtx, {
+                type: 'line',
+                data: {
+                    labels: ['2020', '2021', '2022', '2023', '2024', 'TTM'],
+                    datasets: githubData.map((row, index) => {
+                        const colors = [
+                            'rgb(0, 132, 231)',
+                            'rgb(239, 68, 68)',
+                            'rgb(16, 185, 129)',
+                            'rgb(59, 130, 246)',
+                            'rgb(245, 158, 11)'
+                        ];
+                        return {
+                            label: row.project,
+                            data: [row.stars2020, row.stars2021, row.stars2022, row.stars2023, row.stars2024, row.starsTTM],
+                            borderColor: colors[index],
+                            backgroundColor: colors[index].replace('rgb', 'rgba').replace(')', ', 0.1)'),
+                            tension: 0.4,
+                            fill: false,
+                            borderWidth: row.project === 'Proj1' ? 4 : 2,
+                            pointRadius: row.project === 'Proj1' ? 5 : 3,
+                            pointHoverRadius: 7
+                        };
+                    })
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 10,
+                                font: { size: 11 }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.parsed.y.toLocaleString();
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            ticks: {
+                                callback: function(value) {
+                                    return (value / 1000).toFixed(0) + 'k';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // GitHub Radar Chart
+            // Dynamically derive maxima for each metric so that scores are relative to the data set
+            const maxStars = githubData.reduce((max, row) => Math.max(max, row.starsTTM), 0);
+            const maxForks = githubData.reduce((max, row) => Math.max(max, row.forks), 0);
+            const maxContributors = githubData.reduce((max, row) => Math.max(max, row.contributorsTTM), 0);
+            const maxCommits = githubData.reduce((max, row) => Math.max(max, row.commitsTTM), 0);
+            const maxDependents = githubData.reduce((max, row) => Math.max(max, row.dependents), 0);
+
+            const githubRadarCtx = document.getElementById('githubRadarChart').getContext('2d');
+            new Chart(githubRadarCtx, {
+                type: 'radar',
+                data: {
+                    labels: ['Stars (TTM)', 'Forks', 'Contributors (TTM)', 'Commits (TTM)', 'Dependents'],
+                    datasets: githubData.map((row, index) => {
+                        const colors = [
+                            'rgb(0, 132, 231)',
+                            'rgb(239, 68, 68)',
+                            'rgb(16, 185, 129)',
+                            'rgb(59, 130, 246)',
+                            'rgb(245, 158, 11)'
+                        ];
+                        // Each metric is scaled relative to the largest value across all projects (0‑100 range)
+                        return {
+                            label: row.project,
+                            data: [
+                                maxStars ? (row.starsTTM / maxStars) * 100 : 0,
+                                maxForks ? (row.forks / maxForks) * 100 : 0,
+                                maxContributors ? (row.contributorsTTM / maxContributors) * 100 : 0,
+                                maxCommits ? (row.commitsTTM / maxCommits) * 100 : 0,
+                                maxDependents ? (row.dependents / maxDependents) * 100 : 0
+                            ],
+                            borderColor: colors[index],
+                            backgroundColor: colors[index].replace('rgb', 'rgba').replace(')', ', 0.15)'),
+                            borderWidth: row.project === 'Proj1' ? 3 : 2,
+                            pointRadius: row.project === 'Proj1' ? 4 : 2,
+                            pointHoverRadius: 6
+                        };
+                    })
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 10,
+                                font: { size: 11 }
+                            }
+                        }
+                    },
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                stepSize: 20,
+                                callback: function(value) {
+                                    return value;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Stack Overflow Total Questions Chart
+            const soQuestionsCtx = document.getElementById('stackOverflowQuestionsChart').getContext('2d');
+            new Chart(soQuestionsCtx, {
+                type: 'bar',
+                data: {
+                    labels: githubData.map(row => row.project),
+                    datasets: [{
+                        label: 'Total SO Questions',
+                        data: githubData.map(row => row.soQuestions),
+                        backgroundColor: [
+                            'rgba(0, 132, 231, 0.8)',
+                            'rgba(239, 68, 68, 0.8)',
+                            'rgba(16, 185, 129, 0.8)',
+                            'rgba(59, 130, 246, 0.8)',
+                            'rgba(245, 158, 11, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgb(0, 132, 231)',
+                            'rgb(239, 68, 68)',
+                            'rgb(16, 185, 129)',
+                            'rgb(59, 130, 246)',
+                            'rgb(245, 158, 11)'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return 'Questions: ' + context.parsed.y.toLocaleString();
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return value.toLocaleString();
+                                }
+                            },
+                            title: {
+                                display: true,
+                                text: 'Total Questions',
+                                font: { size: 12, weight: 'bold' }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Stack Overflow Questions per 1K Stars (Normalized)
+            const soNormalizedCtx = document.getElementById('stackOverflowNormalizedChart').getContext('2d');
+            new Chart(soNormalizedCtx, {
+                type: 'bar',
+                data: {
+                    labels: githubData.map(row => row.project),
+                    datasets: [{
+                        label: 'SO Questions per 1K Stars',
+                        data: githubData.map(row => parseFloat(row.soQuestionsPerKStars)),
+                        backgroundColor: [
+                            'rgba(139, 92, 246, 0.8)',
+                            'rgba(239, 68, 68, 0.8)',
+                            'rgba(16, 185, 129, 0.8)',
+                            'rgba(59, 130, 246, 0.8)',
+                            'rgba(245, 158, 11, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgb(139, 92, 246)',
+                            'rgb(239, 68, 68)',
+                            'rgb(16, 185, 129)',
+                            'rgb(59, 130, 246)',
+                            'rgb(245, 158, 11)'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return 'Questions per 1K Stars: ' + context.parsed.y.toFixed(1);
+                                },
+                                afterLabel: function(context) {
+                                    return 'Indicates help-seeking behavior';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Questions / 1000 Stars',
+                                font: { size: 12, weight: 'bold' }
                             }
                         }
                     }
