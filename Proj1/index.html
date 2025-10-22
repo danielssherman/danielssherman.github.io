@@ -163,14 +163,10 @@
                 </div>
             </div>
 
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 25px;">
-                <div style="background: white; padding: 20px; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                    <h3 style="margin-top: 0; color: #333; font-size: 16px;">Community Engagement Radar</h3>
+            <div style="background: white; padding: 25px; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 25px;">
+                <h3 style="margin-top: 0; color: #333; font-size: 16px;">Community Engagement Radar</h3>
+                <div style="max-width: 600px; margin: 0 auto;">
                     <canvas id="githubRadarChart"></canvas>
-                </div>
-                <div style="background: white; padding: 20px; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                    <h3 style="margin-top: 0; color: #333; font-size: 16px;">SO Questions per 1K Stars</h3>
-                    <canvas id="stackOverflowNormalizedChart"></canvas>
                 </div>
             </div>
 
@@ -743,6 +739,34 @@
                 }
             ];
 
+            // Helper function for conditional formatting
+            const getConditionalCellStyle = (params, field) => {
+                const allValues = githubData.map(row => row[field]);
+                const maxValue = Math.max(...allValues);
+                const minValue = Math.min(...allValues);
+                const value = params.value;
+
+                let backgroundColor = 'transparent';
+                let color = '#333';
+
+                // Highlight max (strong) in green
+                if (value === maxValue) {
+                    backgroundColor = '#d1fae5';
+                    color = '#065f46';
+                }
+                // Highlight min (weak) in red
+                else if (value === minValue) {
+                    backgroundColor = '#fee2e2';
+                    color = '#991b1b';
+                }
+
+                return {
+                    fontWeight: '500',
+                    backgroundColor: backgroundColor,
+                    color: color
+                };
+            };
+
             // GitHub Grid column definitions
             const githubColumnDefs = [
                 {
@@ -762,14 +786,15 @@
                     type: 'numericColumn',
                     valueFormatter: params => params.value.toLocaleString(),
                     width: 130,
-                    cellStyle: { fontWeight: '500' }
+                    cellStyle: params => getConditionalCellStyle(params, 'starsTTM')
                 },
                 {
                     field: 'forks',
                     headerName: 'Forks',
                     type: 'numericColumn',
                     valueFormatter: params => params.value.toLocaleString(),
-                    width: 110
+                    width: 110,
+                    cellStyle: params => getConditionalCellStyle(params, 'forks')
                 },
                 {
                     field: 'contributorsTTM',
@@ -777,7 +802,7 @@
                     type: 'numericColumn',
                     valueFormatter: params => params.value.toLocaleString(),
                     width: 160,
-                    cellStyle: { fontWeight: '500' },
+                    cellStyle: params => getConditionalCellStyle(params, 'contributorsTTM'),
                     tooltipValueGetter: () => 'Contributors in last 12 months'
                 },
                 {
@@ -786,7 +811,7 @@
                     type: 'numericColumn',
                     valueFormatter: params => params.value.toLocaleString(),
                     width: 140,
-                    cellStyle: { fontWeight: '500' },
+                    cellStyle: params => getConditionalCellStyle(params, 'commitsTTM'),
                     tooltipValueGetter: () => 'Commits in last 12 months'
                 },
                 {
@@ -795,7 +820,7 @@
                     type: 'numericColumn',
                     valueFormatter: params => params.value.toLocaleString(),
                     width: 130,
-                    cellStyle: { fontWeight: '500', color: '#059669' }
+                    cellStyle: params => getConditionalCellStyle(params, 'dependents')
                 },
                 {
                     field: 'soQuestions',
@@ -803,29 +828,8 @@
                     type: 'numericColumn',
                     valueFormatter: params => params.value.toLocaleString(),
                     width: 130,
-                    cellStyle: { fontWeight: '500', color: '#f97316' },
+                    cellStyle: params => getConditionalCellStyle(params, 'soQuestions'),
                     tooltipValueGetter: () => 'Total Stack Overflow questions'
-                },
-                {
-                    field: 'soQuestionsPerKStars',
-                    headerName: 'SO Q/1K Stars',
-                    type: 'numericColumn',
-                    width: 140,
-                    cellStyle: { fontWeight: '500', color: '#8b5cf6' },
-                    tooltipValueGetter: () => 'Stack Overflow questions per 1000 GitHub stars - measures community help-seeking behavior'
-                },
-                {
-                    field: 'engagement',
-                    headerName: 'Rating',
-                    width: 120,
-                    cellStyle: params => {
-                        const colors = {
-                            'Strong': { backgroundColor: '#d1fae5', color: '#065f46', fontWeight: '600' },
-                            'Average': { backgroundColor: '#dbeafe', color: '#1e40af', fontWeight: '600' },
-                            'Weak': { backgroundColor: '#fee2e2', color: '#991b1b', fontWeight: '600' }
-                        };
-                        return colors[params.value] || {};
-                    }
                 }
             ];
 
@@ -1024,63 +1028,6 @@
                             title: {
                                 display: true,
                                 text: 'Total Questions',
-                                font: { size: 12, weight: 'bold' }
-                            }
-                        }
-                    }
-                }
-            });
-
-            // Stack Overflow Questions per 1K Stars (Normalized)
-            const soNormalizedCtx = document.getElementById('stackOverflowNormalizedChart').getContext('2d');
-            new Chart(soNormalizedCtx, {
-                type: 'bar',
-                data: {
-                    labels: githubData.map(row => row.project),
-                    datasets: [{
-                        label: 'SO Questions per 1K Stars',
-                        data: githubData.map(row => parseFloat(row.soQuestionsPerKStars)),
-                        backgroundColor: [
-                            'rgba(139, 92, 246, 0.8)',
-                            'rgba(239, 68, 68, 0.8)',
-                            'rgba(16, 185, 129, 0.8)',
-                            'rgba(59, 130, 246, 0.8)',
-                            'rgba(245, 158, 11, 0.8)'
-                        ],
-                        borderColor: [
-                            'rgb(139, 92, 246)',
-                            'rgb(239, 68, 68)',
-                            'rgb(16, 185, 129)',
-                            'rgb(59, 130, 246)',
-                            'rgb(245, 158, 11)'
-                        ],
-                        borderWidth: 2
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return 'Questions per 1K Stars: ' + context.parsed.y.toFixed(1);
-                                },
-                                afterLabel: function(context) {
-                                    return 'Indicates help-seeking behavior';
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Questions / 1000 Stars',
                                 font: { size: 12, weight: 'bold' }
                             }
                         }
