@@ -170,6 +170,11 @@
                 </div>
             </div>
 
+            <div style="background: white; padding: 25px; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 25px;">
+                <h3 style="margin-top: 0; color: #333; font-size: 16px;">Top 20 Contributors - Commits by Year (2023-2025)</h3>
+                <canvas id="contributorsChart"></canvas>
+            </div>
+
             <div style="background: white; padding: 15px; border-radius: 4px; border-left: 4px solid #0084e7;">
                 <p style="margin: 0; font-size: 13px; color: #666;">
                     <strong>Engagement Rating:</strong> <span id="proj1Engagement" style="font-weight: 600; color: #0084e7;">-</span> |
@@ -1029,6 +1034,106 @@
                                 display: true,
                                 text: 'Total Questions',
                                 font: { size: 12, weight: 'bold' }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Top 20 Contributors - Commits by Year Chart (sorted by 2025 commits, descending)
+            const contributorsData = [
+                { name: 'seanlandsman', y2023: 554, y2024: 580, y2025: 566 },
+                { name: 'Stephen Cooper', y2023: 689, y2024: 1079, y2025: 358 },
+                { name: 'Peter Reynolds', y2023: 369, y2024: 609, y2025: 299 },
+                { name: 'Steph Meslin-Weber', y2023: 0, y2024: 63, y2025: 298 },
+                { name: 'Guilherme Lopes', y2023: 489, y2024: 427, y2025: 266 },
+                { name: 'AgGitDeployment', y2023: 19, y2024: 253, y2025: 262 },
+                { name: 'Tak Tran', y2023: 269, y2024: 891, y2025: 261 },
+                { name: 'Andrew Glazier', y2023: 438, y2024: 308, y2025: 232 },
+                { name: 'Elias Malik', y2023: 0, y2024: 153, y2025: 201 },
+                { name: 'Salvatore Previti', y2023: 0, y2024: 138, y2025: 176 },
+                { name: 'Mark Durrant', y2023: 426, y2024: 354, y2025: 146 },
+                { name: 'Kyler Phillips', y2023: 25, y2024: 409, y2025: 93 },
+                { name: 'Bernie Sumption', y2023: 140, y2024: 491, y2025: 85 },
+                { name: 'Alan Treadway', y2023: 616, y2024: 80, y2025: 58 },
+                { name: 'Adam Wang', y2023: 61, y2024: 130, y2025: 56 },
+                { name: 'James Swinton-Bland', y2023: 91, y2024: 156, y2025: 15 },
+                { name: 'Laurence Roberts', y2023: 375, y2024: 0, y2025: 6 },
+                { name: 'Mana Peirov', y2023: 405, y2024: 30, y2025: 0 },
+                { name: 'Alexander Shutau', y2023: 407, y2024: 0, y2025: 0 },
+                { name: 'rmc-software', y2023: 249, y2024: 78, y2025: 0 }
+            ];
+
+            const contributorsCtx = document.getElementById('contributorsChart').getContext('2d');
+            new Chart(contributorsCtx, {
+                type: 'bar',
+                data: {
+                    labels: contributorsData.map(c => c.name),
+                    datasets: [
+                        {
+                            label: '2023',
+                            data: contributorsData.map(c => c.y2023),
+                            backgroundColor: 'rgba(239, 68, 68, 0.8)',
+                            borderColor: 'rgb(239, 68, 68)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: '2024',
+                            data: contributorsData.map(c => c.y2024),
+                            backgroundColor: 'rgba(59, 130, 246, 0.8)',
+                            borderColor: 'rgb(59, 130, 246)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: '2025',
+                            data: contributorsData.map(c => c.y2025),
+                            backgroundColor: 'rgba(16, 185, 129, 0.8)',
+                            borderColor: 'rgb(16, 185, 129)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                padding: 15,
+                                font: { size: 12 }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.parsed.y.toLocaleString() + ' commits';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            stacked: false,
+                            ticks: {
+                                autoSkip: false,
+                                maxRotation: 45,
+                                minRotation: 45,
+                                font: { size: 10 }
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            stacked: false,
+                            title: {
+                                display: true,
+                                text: 'Number of Commits',
+                                font: { size: 12, weight: 'bold' }
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return value.toLocaleString();
+                                }
                             }
                         }
                     }
